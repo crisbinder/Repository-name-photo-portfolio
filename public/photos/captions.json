@@ -1,0 +1,18 @@
+{
+  "风光/mountain-sunrise.jpg": {
+    "title": "山谷晨光",
+    "description": "清晨的第一束光越过山脊，雾气停留在树林上方。"
+  },
+  "星空/milky-way.jpg": {
+    "title": "银河之夜",
+    "description": "在低光污染区域拍摄的夏季银河，强调天空与地景的比例。"
+  },
+  "人像/window-portrait.jpg": {
+    "title": "窗边人像",
+    "description": "自然光人像，保留人物神态和空间中的安静氛围。"
+  },
+  "人文/street-moment.jpg": {
+    "title": "街角日常",
+    "description": "记录城市生活中的短暂相遇与人的动作关系。"
+  }
+}

@@ -1,0 +1,7 @@
+node_modules
+.next
+out
+.env*.local
+*.log
+public/photos-original/**/*
+!public/photos-original/**/.gitkeep
