@@ -27,6 +27,20 @@ function outputName(fileName) {
   return `${path.parse(fileName).name}.webp`;
 }
 
+async function needsOptimize(inputPath, webOutputPath, largeOutputPath) {
+  if (!(await exists(webOutputPath)) || !(await exists(largeOutputPath))) {
+    return true;
+  }
+
+  const [inputStat, webStat, largeStat] = await Promise.all([
+    fs.stat(inputPath),
+    fs.stat(webOutputPath),
+    fs.stat(largeOutputPath)
+  ]);
+
+  return webStat.mtimeMs < inputStat.mtimeMs || largeStat.mtimeMs < inputStat.mtimeMs;
+}
+
 async function optimizeImage(inputPath, webOutputPath, largeOutputPath) {
   const image = sharp(inputPath, { failOn: "none" }).rotate();
 
@@ -49,6 +63,7 @@ async function main() {
   }
 
   let count = 0;
+  let skipped = 0;
 
   for (const category of categories) {
     const sourceDir = path.join(originalRoot, category);
@@ -67,13 +82,19 @@ async function main() {
       const webOutputPath = path.join(webDir, outputName(fileName));
       const largeOutputPath = path.join(largeDir, outputName(fileName));
 
+      if (!(await needsOptimize(inputPath, webOutputPath, largeOutputPath))) {
+        skipped += 1;
+        console.log(`Skipped ${category}/${fileName}`);
+        continue;
+      }
+
       await optimizeImage(inputPath, webOutputPath, largeOutputPath);
       count += 1;
       console.log(`Optimized ${category}/${fileName} -> ${outputName(fileName)}`);
     }
   }
 
-  console.log(`Done. Optimized ${count} image${count === 1 ? "" : "s"}.`);
+  console.log(`Done. Optimized ${count} image${count === 1 ? "" : "s"}, skipped ${skipped}.`);
 }
 
 main().catch((error) => {

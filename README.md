@@ -86,3 +86,10 @@ public/photos/captions.json
 7. 部署完成后会得到一个 `.vercel.app` 免费网址。
 
 以后新增照片时，把图片放进分类文件夹，提交并推送到 GitHub，Vercel 会自动重新部署。
+
+## 网站推送更新：
+```bash
+git add .
+git commit -m "update portfolio"
+git push
+```
