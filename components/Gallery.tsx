@@ -87,6 +87,7 @@ export default function Gallery({ photos }: { photos: PhotoItem[] }) {
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const [selectedPhoto, setSelectedPhoto] = useState<PhotoItem | null>(null);
+  const [isAuthorOpen, setIsAuthorOpen] = useState(false);
   const [lightboxDirection, setLightboxDirection] = useState<"previous" | "next" | "open">("open");
   const [, startTransition] = useTransition();
   const wheelSwitchTimeRef = useRef(0);
@@ -145,7 +146,7 @@ export default function Gallery({ photos }: { photos: PhotoItem[] }) {
     const previousHtmlOverflow = document.documentElement.style.overflow;
     const previousBodyOverflow = document.body.style.overflow;
 
-    if (selectedPhoto) {
+    if (selectedPhoto || isAuthorOpen) {
       document.documentElement.classList.add("lightbox-open");
       document.documentElement.style.overflow = "hidden";
       document.body.style.overflow = "hidden";
@@ -156,7 +157,7 @@ export default function Gallery({ photos }: { photos: PhotoItem[] }) {
       document.documentElement.style.overflow = previousHtmlOverflow;
       document.body.style.overflow = previousBodyOverflow;
     };
-  }, [selectedPhoto]);
+  }, [isAuthorOpen, selectedPhoto]);
 
   const visiblePhotos = useMemo(() => {
     const keyword = deferredQuery.trim().toLowerCase();
@@ -283,12 +284,16 @@ export default function Gallery({ photos }: { photos: PhotoItem[] }) {
           <a className="brand" href="#">
             Portfolio / Studio
           </a>
-          <div className="author-badge" aria-label="作者">
+          <button
+            className="author-badge"
+            onClick={() => setIsAuthorOpen(true)}
+            type="button"
+            aria-label="查看作者信息"
+          >
             <span className="author-avatar">
               <img src="/avatar/Cris.jpg" alt="Crisbinder" />
             </span>
-            <span>Crisbinder</span>
-          </div>
+          </button>
         </nav>
 
         <div className="hero-copy">
@@ -351,6 +356,36 @@ export default function Gallery({ photos }: { photos: PhotoItem[] }) {
       </section>
 
       <ThemeToggle />
+
+      {isAuthorOpen ? (
+        <div className="author-modal" role="dialog" aria-modal="true" onClick={() => setIsAuthorOpen(false)}>
+          <div className="author-panel" onClick={(event) => event.stopPropagation()}>
+            <button
+              className="author-close"
+              onClick={() => setIsAuthorOpen(false)}
+              type="button"
+              aria-label="关闭作者信息"
+            >
+              ×
+            </button>
+
+            <img className="author-modal-avatar" src="/avatar/Cris.jpg" alt="Crisbinder" />
+            <div className="author-modal-name">Crisbinder</div>
+            <div className="author-modal-subtitle">扫描二维码添加微信或者小红书关注我~</div>
+
+            <div className="author-qr-grid">
+              <div className="author-qr-card">
+                <img src="/contact/wechat-qr.png" alt="微信二维码" />
+                <span>微信</span>
+              </div>
+              <div className="author-qr-card">
+                <img src="/contact/xiaohongshu-qr.png" alt="小红书二维码" />
+                <span>小红书</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {selectedPhoto ? (
         <div
