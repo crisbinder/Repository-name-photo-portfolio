@@ -87,6 +87,7 @@ export default function Gallery({ photos }: { photos: PhotoItem[] }) {
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const [selectedPhoto, setSelectedPhoto] = useState<PhotoItem | null>(null);
+  const [displayedPhoto, setDisplayedPhoto] = useState<PhotoItem | null>(null);
   const [isAuthorOpen, setIsAuthorOpen] = useState(false);
   const [lightboxDirection, setLightboxDirection] = useState<"previous" | "next" | "open">("open");
   const [, startTransition] = useTransition();
@@ -158,6 +159,39 @@ export default function Gallery({ photos }: { photos: PhotoItem[] }) {
       document.body.style.overflow = previousBodyOverflow;
     };
   }, [isAuthorOpen, selectedPhoto]);
+
+  useEffect(() => {
+    if (!selectedPhoto) {
+      setDisplayedPhoto(null);
+      return;
+    }
+
+    if (!displayedPhoto || displayedPhoto.id === selectedPhoto.id) {
+      setDisplayedPhoto(selectedPhoto);
+      return;
+    }
+
+    let cancelled = false;
+    const image = new Image();
+    image.decoding = "async";
+    image.onload = () => {
+      if (!cancelled) {
+        setDisplayedPhoto(selectedPhoto);
+      }
+    };
+    image.onerror = () => {
+      if (!cancelled) {
+        setDisplayedPhoto(selectedPhoto);
+      }
+    };
+    image.src = selectedPhoto.previewSrc;
+
+    return () => {
+      cancelled = true;
+      image.onload = null;
+      image.onerror = null;
+    };
+  }, [displayedPhoto, selectedPhoto]);
 
   const visiblePhotos = useMemo(() => {
     const keyword = deferredQuery.trim().toLowerCase();
@@ -418,12 +452,12 @@ export default function Gallery({ photos }: { photos: PhotoItem[] }) {
         </div>
       ) : null}
 
-      {selectedPhoto ? (
+      {selectedPhoto && displayedPhoto ? (
         <div
           className="lightbox"
           role="dialog"
           aria-modal="true"
-          style={{ "--lightbox-bg": `url("${selectedPhoto.previewSrc}")` } as CSSProperties}
+          style={{ "--lightbox-bg": `url("${displayedPhoto.previewSrc}")` } as CSSProperties}
           onClick={() => setSelectedPhoto(null)}
           onWheel={handleLightboxWheel}
         >
@@ -438,13 +472,13 @@ export default function Gallery({ photos }: { photos: PhotoItem[] }) {
               type="button"
               aria-label="退出全屏预览"
             >
-              <img key={selectedPhoto.id} src={selectedPhoto.previewSrc} alt={selectedPhoto.title} />
+              <img key={displayedPhoto.id} src={displayedPhoto.previewSrc} alt={displayedPhoto.title} />
             </button>
           </div>
 
           <div className="lightbox-footer" onClick={(event) => event.stopPropagation()}>
             <div className="lightbox-caption">
-              <span>{selectedPhoto.title} / {selectedPhoto.category}</span>
+              <span>{displayedPhoto.title} / {displayedPhoto.category}</span>
             </div>
 
             {visiblePhotos.length > 1 ? (
