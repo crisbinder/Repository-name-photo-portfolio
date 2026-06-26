@@ -183,6 +183,37 @@ export default function Gallery({ photos }: { photos: PhotoItem[] }) {
     return visiblePhotos.slice(startIndex, startIndex + 7);
   }, [selectedPhoto, visiblePhotos]);
 
+  useEffect(() => {
+    if (!selectedPhoto || visiblePhotos.length <= 1) {
+      return;
+    }
+
+    const currentIndex = visiblePhotos.findIndex((photo) => photo.id === selectedPhoto.id);
+    if (currentIndex < 0) {
+      return;
+    }
+
+    const preloadIndexes = [
+      currentIndex,
+      currentIndex <= 0 ? visiblePhotos.length - 1 : currentIndex - 1,
+      currentIndex >= visiblePhotos.length - 1 ? 0 : currentIndex + 1
+    ];
+
+    const preloadImages = preloadIndexes.map((index) => {
+      const image = new Image();
+      image.decoding = "async";
+      image.src = visiblePhotos[index].previewSrc;
+      return image;
+    });
+
+    return () => {
+      preloadImages.forEach((image) => {
+        image.onload = null;
+        image.onerror = null;
+      });
+    };
+  }, [selectedPhoto, visiblePhotos]);
+
   const handleFilterChange = useCallback((filter: Filter) => {
     startTransition(() => {
       setActiveFilter(filter);
