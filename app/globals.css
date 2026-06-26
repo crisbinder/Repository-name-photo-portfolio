@@ -141,19 +141,18 @@ button {
 }
 
 .hero {
+  position: relative;
   min-height: 0;
   display: grid;
-  gap: 24px;
+  gap: 18px;
   padding: 26px clamp(20px, 5vw, 72px) 0;
   background: var(--bg);
   transition: none;
 }
 
 .topbar {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  align-items: center;
+  display: block;
+  min-height: 0;
 }
 
 .brand {
@@ -173,6 +172,9 @@ button {
 }
 
 .author-badge {
+  position: absolute;
+  top: 16px;                    /* 头像距离顶部的间距 */
+  right: clamp(20px, 5vw, 72px);
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
@@ -193,11 +195,13 @@ button {
   place-items: center;
   width: 54px;
   height: 54px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(142, 218, 170, 0.918);
   border-radius: 50%;
   overflow: hidden;
   background: var(--panel);
-  box-shadow: 0 12px 28px var(--shadow);
+  box-shadow:
+    0 0 0 1.5px rgba(196, 248, 213, 0.808),
+    0 12px 28px var(--shadow);
 }
 
 .author-avatar img {
@@ -1006,21 +1010,22 @@ h1 {
   .hero {
     padding-top: 22px;
     padding-bottom: 0;
-    gap: 22px;
+    gap: 16px;
   }
 
   .topbar {
-    align-items: flex-start;
-    flex-direction: column;
+    display: block;
   }
 
   .author-badge {
+    top: 22px;
+    right: clamp(20px, 5vw, 72px);
     justify-content: flex-end;
   }
 
   .author-avatar {
-    width: 68px;
-    height: 68px;
+    width: 56px;
+    height: 56px;
   }
 
   h1 {
@@ -1056,7 +1061,7 @@ h1 {
 
 @media (min-width: 1200px) and (orientation: landscape) {
   .hero {
-    gap: 6px;
+    gap: 14px;
     padding-top: 14px;
     padding-bottom: 0;
   }
